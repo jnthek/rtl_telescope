@@ -1,14 +1,10 @@
-.PHONY: sdrbuffer.h
+.PHONY: sdrshmbufffer.h
 
-all: rtl2binary stdout2shmbuf
+all: rtl2rbuff
 
-rtl2binary: rtl2binary.c
-	@echo "Compiling rtl2binary"
-	gcc -O0 -Wall rtl2binary.c -o rtl2binary -lrt -lrtlsdr
-
-stdout2shmbuf: stdout2shmbuf.c
-	@echo "Compiling pipe to shm tools"
-	gcc -Wall stdout2shmbuf.c -o stdout2shmbuf -lm -lrt -lpthread
+rtl2rbuff: rtl2rbuff.c
+	@echo "Compiling rtl2rbuff"
+	gcc -O0 -Wall rtl2rbuff.c -o rtl2rbuff -lrt -lm -lpthread -lrtlsdr 
 
 clean :
-	rm -f rtl2binary stdout2shmbuf
+	rm -f rtl2rbuff 
