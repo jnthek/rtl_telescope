@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <time.h>
 #include <rtl-sdr.h>
-#include "sdrshmbufffer.h"
+#include "sdrshmbuffer.h"
 
 static volatile int run_var = 1;
 

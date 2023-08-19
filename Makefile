@@ -1,4 +1,4 @@
-.PHONY: sdrshmbufffer.h
+.PHONY: sdrshmbuffer.h
 
 all: rtl2rbuff
 
