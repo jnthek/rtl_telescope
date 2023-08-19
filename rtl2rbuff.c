@@ -17,13 +17,14 @@ static volatile int run_var = 1;
 void inter_handler(int dummy) 
 {
     run_var = 0;
+    fprintf(stdout, "Signal caught, waiting for the current pass to finish !\n");
 }
 
 int main(int argc, char **argv)
 {
-    uint32_t devcount, index, setfreq, setrate, setgain;
+    uint32_t devcount, index, setfreq, setrate, setgain, block_index;
     char manufact[256], product[256], serial[256], option, SHM_RBUFF[20] = "rtlbuff";
-    int res, nread, fd, block_index;
+    int res, nread, fd;
     static rtlsdr_dev_t *dev = NULL;
     struct sdrbuf *rtlbuffer;
     struct timespec acqtime;
@@ -128,18 +129,19 @@ int main(int argc, char **argv)
 
     fprintf(stdout, "Gain set to %d 10th dB\n", setgain);
 
-    block_index = 0;
     signal(SIGINT, inter_handler);
     while (run_var)
     { 
         clock_gettime(CLOCK_REALTIME, &acqtime);
         rtlbuffer->tv_sec  = (uint32_t)acqtime.tv_sec;
         rtlbuffer->tv_nsec = (uint32_t)acqtime.tv_nsec;
-        rtlbuffer->blockindex = block_index;
-        rtlsdr_read_sync(dev, (rtlbuffer->buffer + (block_index*BLOCKSIZE)), BLOCKSIZE, &nread);
-        block_index = (block_index+1)%(BUFFDEPTH-1);
+        for (block_index=0; block_index<(BUFFDEPTH-1); block_index++)
+        {
+            rtlbuffer->blockindex = block_index;
+            rtlsdr_read_sync(dev, (rtlbuffer->buffer + (block_index*BLOCKSIZE)), BLOCKSIZE, &nread); //Real vs IQ doubt 
+        }        
     }
-    printf ("Signal caught, exiting the rtl2rbuff code \n");
+    fprintf(stdout, "Exiting the rtl2rbuff code \n");
     munmap(rtlbuffer, BUFSIZE);
     shm_unlink(SHM_RBUFF);
     close(fd);
